@@ -2,6 +2,7 @@
 
 //--------------------------------------------------------------
 void ofApp::setup(){
+    int bufferSize = 512;
     sampleRate = 44100;
     channels = 2;
 
@@ -27,7 +28,19 @@ void ofApp::setup(){
 
 //    soundStream.listDevices();
 //    soundStream.setDeviceID(11);
-    soundStream.setup(this, 0, channels, sampleRate, 256, 4);
+    soundStream.setup(this, 2, channels, sampleRate, bufferSize, 4);
+    soundStream.setOutput(output);
+
+    ofRectangle r(0, 0, ofGetWidth(), ofGetHeight());
+    r.scaleFromCenter(0.95);
+    face.set(r);
+
+    ofFileDialogResult result = ofSystemLoadDialog("Please select an audio file (.mp3, .wav, .aiff, .aac");
+    if (result.bSuccess) {
+        benVoice.load(result.getPath());
+        benVoice.play();
+    }
+    benVoice.connectTo(face).connectTo(output);
 
     //ofSetWindowShape(vidGrabber.getWidth(), vidGrabber.getHeight()	);
     bRecording = false;
@@ -55,6 +68,9 @@ void ofApp::update(){
 //--------------------------------------------------------------
 void ofApp::draw(){
     {
+        recordFbo.begin();
+        face.draw();
+        recordFbo.end();
         if(bRecording){
             recordFbo.readToPixels(recordPixels);
 

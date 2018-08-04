@@ -2,7 +2,8 @@
 
 #include "ofMain.h"
 #include "ofxVideoRecorder.h"
-#include "ofxSoundObjects.h"
+#include "ofxSoundPlayerObject.h"
+#include "faceDraw.h"
 
 class ofApp : public ofBaseApp{
 
@@ -37,5 +38,8 @@ public:
     ofFbo recordFbo;
     ofPixels recordPixels;
 
-    ofSoundPlayer benVoice;
+    ofSoundStream stream;
+    ofxSoundOutput output;
+    ofxSoundPlayerObject benVoice;
+    faceDraw face;
 };
