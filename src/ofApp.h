@@ -24,7 +24,6 @@ public:
     void gotMessage(ofMessage msg);
     void audioIn(float * input, int bufferSize, int nChannels);
 
-    ofVideoGrabber      vidGrabber;
     ofxVideoRecorder    vidRecorder;
     ofSoundStream       soundStream;
     bool bRecording;
@@ -39,7 +38,11 @@ public:
     ofPixels recordPixels;
 
     ofSoundStream stream;
-    ofxSoundOutput output;
+    ofxSoundMixer mixer;
     ofxSoundPlayerObject benVoice;
-    faceDraw face;
+    ofxSoundPlayerObject danVoice;
+    ofxSoundPlayerObject mattVoice;
+    faceDraw benFace;
+    faceDraw danFace;
+    faceDraw mattFace;
 };

@@ -10,9 +10,6 @@ void ofApp::setup(){
 
     ofSetFrameRate(60);
     ofSetLogLevel(OF_LOG_VERBOSE);
-    vidGrabber.setDesiredFrameRate(30);
-    vidGrabber.initGrabber(640, 480);
-//    vidRecorder.setFfmpegLocation(ofFilePath::getAbsolutePath("ffmpeg")); // use this is you have ffmpeg installed in your data folder
 
     fileName = "testMovie";
     fileExt = ".mov"; // ffmpeg uses the extension to determine the container type. run 'ffmpeg -formats' to see supported formats
@@ -26,23 +23,44 @@ void ofApp::setup(){
 
     ofAddListener(vidRecorder.outputFileCompleteEvent, this, &ofApp::recordingComplete);
 
-//    soundStream.listDevices();
-//    soundStream.setDeviceID(11);
-    soundStream.setup(this, 2, channels, sampleRate, bufferSize, 4);
-    soundStream.setOutput(output);
-
-    ofRectangle r(0, 0, ofGetWidth(), ofGetHeight());
-    r.scaleFromCenter(0.95);
-    face.set(r);
+    ofRectangle r1(0, 0, ofGetWidth()/3, ofGetHeight());
+    r1.scaleFromCenter(0.95);
+    benFace.set(r1);
 
     ofFileDialogResult result = ofSystemLoadDialog("Please select an audio file (.mp3, .wav, .aiff, .aac");
     if (result.bSuccess) {
         benVoice.load(result.getPath());
         benVoice.play();
     }
-    benVoice.connectTo(face).connectTo(output);
+    benVoice.connectTo(benFace).connectTo(mixer);
 
-    //ofSetWindowShape(vidGrabber.getWidth(), vidGrabber.getHeight()	);
+    ofRectangle r2(ofGetWidth()/3, 0, ofGetWidth()/3, ofGetHeight());
+    r2.scaleFromCenter(0.95);
+    danFace.set(r2);
+
+    result = ofSystemLoadDialog("Please select an audio file (.mp3, .wav, .aiff, .aac");
+    if (result.bSuccess) {
+        danVoice.load(result.getPath());
+        danVoice.play();
+    }
+    danVoice.connectTo(danFace).connectTo(mixer);
+
+    ofRectangle r3(ofGetWidth()/3*2, 0, ofGetWidth()/3, ofGetHeight());
+    r3.scaleFromCenter(0.95);
+    mattFace.set(r3);
+
+    result = ofSystemLoadDialog("Please select an audio file (.mp3, .wav, .aiff, .aac");
+    if (result.bSuccess) {
+        mattVoice.load(result.getPath());
+        mattVoice.play();
+    }
+    mattVoice.connectTo(mattFace).connectTo(mixer);
+
+//    soundStream.listDevices();
+//    soundStream.setDeviceID(11);
+    soundStream.setup(this, 2, channels, sampleRate, bufferSize, 4);
+    soundStream.setOutput(mixer);
+
     bRecording = false;
     ofEnableAlphaBlending();
 }
@@ -55,21 +73,17 @@ void ofApp::exit(){
 
 //--------------------------------------------------------------
 void ofApp::update(){
-    vidGrabber.update();
-    if(vidGrabber.isFrameNew()){
-        recordFbo.begin();
-        ofClear(0, 0, 0, 255);
-        ofSetColor(255);
-        vidGrabber.draw(0,0);
-        recordFbo.end();
-    }
 }
 
 //--------------------------------------------------------------
 void ofApp::draw(){
     {
         recordFbo.begin();
-        face.draw();
+        ofClear(0, 0, 0, 255);
+        ofSetColor(255);
+        benFace.draw();
+        danFace.draw();
+        mattFace.draw();
         recordFbo.end();
         if(bRecording){
             recordFbo.readToPixels(recordPixels);
@@ -134,9 +148,6 @@ void ofApp::keyReleased(int key){
         bRecording = !bRecording;
         if(bRecording && !vidRecorder.isInitialized()) {
             vidRecorder.setup(fileName+ofGetTimestampString()+fileExt, recordFbo.getWidth(), recordFbo.getHeight(), 30, sampleRate, channels);
-//          vidRecorder.setup(fileName+ofGetTimestampString()+fileExt, vidGrabber.getWidth(), vidGrabber.getHeight(), 30); // no audio
-//            vidRecorder.setup(fileName+ofGetTimestampString()+fileExt, 0,0,0, sampleRate, channels); // no video
-//          vidRecorder.setupCustomOutput(vidGrabber.getWidth(), vidGrabber.getHeight(), 30, sampleRate, channels, "-vcodec mpeg4 -b 1600k -acodec mp2 -ab 128k -f mpegts udp://localhost:1234"); // for custom ffmpeg output string (streaming, etc)
 
             // Start recording
             vidRecorder.start();
