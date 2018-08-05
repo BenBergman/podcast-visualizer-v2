@@ -27,6 +27,9 @@ public:
     void gotMessage(ofMessage msg);
     void audioIn(float * input, int bufferSize, int nChannels);
 
+    void startRecording();
+    void stopRecording();
+
     ofxVideoRecorder    vidRecorder;
     ofSoundStream       soundStream;
     bool bRecording;

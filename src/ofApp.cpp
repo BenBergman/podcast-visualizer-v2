@@ -60,6 +60,8 @@ void ofApp::setup(){
 
     bRecording = false;
     ofEnableAlphaBlending();
+
+    startRecording();
 }
 
 //--------------------------------------------------------------
@@ -118,8 +120,17 @@ void ofApp::draw(){
     ss //<< "video queue size: " << vidRecorder.getVideoQueueSize() << endl
     //<< "audio queue size: " << vidRecorder.getAudioQueueSize() << endl
     << "FPS: " << ofGetFrameRate() << endl
-    << (bRecording?"pause":"start") << " recording: r" << endl
-    << (bRecording?"close current video file: c":"") << endl;
+    << (bRecording?"pause":"start") << " recording: r" << endl;
+    if (bRecording) {
+        ss << "close current video file: c" << endl;
+    }
+    if (!mattVoice.isPlaying()) {
+        ss << "Audio clip finished playing" << endl;
+    }
+
+    if (bRecording && !mattVoice.isPlaying()) {
+        stopRecording();
+    }
 
     ofSetColor(0,0,0,100);
     ofDrawRectangle(0, 0, 260, 75);
@@ -149,26 +160,33 @@ void ofApp::keyPressed(int key){
 
 //--------------------------------------------------------------
 void ofApp::keyReleased(int key){
-
     if(key=='r'){
-        bRecording = !bRecording;
-        if(bRecording && !vidRecorder.isInitialized()) {
-            vidRecorder.setup(fileName+ofGetTimestampString()+fileExt, recordFbo.getWidth(), recordFbo.getHeight(), 30, sampleRate, channels);
-
-            // Start recording
-            vidRecorder.start();
-        }
-        else if(!bRecording && vidRecorder.isInitialized()) {
-            vidRecorder.setPaused(true);
-        }
-        else if(bRecording && vidRecorder.isInitialized()) {
-            vidRecorder.setPaused(false);
-        }
+        startRecording();
     }
     if(key=='c'){
-        bRecording = false;
-        vidRecorder.close();
+        stopRecording();
     }
+}
+
+void ofApp::startRecording() {
+    bRecording = !bRecording;
+    if(bRecording && !vidRecorder.isInitialized()) {
+        vidRecorder.setup(fileName+ofGetTimestampString()+fileExt, recordFbo.getWidth(), recordFbo.getHeight(), 30, sampleRate, channels);
+
+        // Start recording
+        vidRecorder.start();
+    }
+    else if(!bRecording && vidRecorder.isInitialized()) {
+        vidRecorder.setPaused(true);
+    }
+    else if(bRecording && vidRecorder.isInitialized()) {
+        vidRecorder.setPaused(false);
+    }
+}
+
+void ofApp::stopRecording() {
+    bRecording = false;
+    vidRecorder.close();
 }
 
 //--------------------------------------------------------------
