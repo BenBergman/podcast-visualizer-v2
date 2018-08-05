@@ -55,8 +55,47 @@ class faceDraw: public ofRectangle, public ofxSoundObject{
             for (int i = 0; i < chans; i++) {
                meshes[i].draw();
             }
+
+
+            float curVol = 0;
+            float curVol2 = 0;
+            for (int i = 0; i < buffer.getNumFrames(); i++) {
+               curVol += buffer[i * chans] * buffer[i * chans];
+               curVol2 += ofMap(buffer[i * chans] * buffer[i * chans], 0.01, 1, 0, 1, true);
+            }
+
+
+            { // raw volumes, no suppressing bleed over
+               curVol /= buffer.getNumFrames();
+               curVol = sqrt(curVol);
+
+               smoothedVol *= 0.90;
+               smoothedVol += 0.10 * curVol;
+
+               ofSetColor(255, 0, 0);
+               ofDrawRectangle(x, this->height, 10, -curVol * this->height);
+               ofDrawRectangle(x + 15, this->height, 10, -smoothedVol * this->height);
+               ofSetColor(255);
+            }
+
+
+            { // supress quiet noises, likely bleed over from neighbours' mics
+               curVol2 /= buffer.getNumFrames();
+               curVol2 = sqrt(curVol2);
+
+               smoothedVol2 *= 0.90;
+               smoothedVol2 += 0.10 * curVol2;
+
+               ofSetColor(0, 255, 0);
+               ofDrawRectangle(x + 30, this->height, 10, -curVol2 * this->height);
+               ofDrawRectangle(x + 30 + 15, this->height, 10, -smoothedVol2 * this->height);
+               ofSetColor(255);
+            }
          }
       }
+
       ofSoundBuffer buffer;
       mutable ofMutex mutex1;
+      float smoothedVol;
+      float smoothedVol2;
 };
