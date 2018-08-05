@@ -23,37 +23,31 @@ void ofApp::setup(){
 
     ofAddListener(vidRecorder.outputFileCompleteEvent, this, &ofApp::recordingComplete);
 
+    ofDirectory dir;
+    dir.listDir("");
+
     ofRectangle r1(0, 0, ofGetWidth()/3, ofGetHeight());
     r1.scaleFromCenter(0.95);
     benFace.set(r1);
 
-    ofFileDialogResult result = ofSystemLoadDialog("Please select an audio file (.mp3, .wav, .aiff, .aac");
-    if (result.bSuccess) {
-        benVoice.load(result.getPath());
-        benVoice.play();
-    }
+    benVoice.load(dir.getAbsolutePath() + "/ben.wav");
+    benVoice.play();
     benVoice.connectTo(benFace).connectTo(mixer);
 
     ofRectangle r2(ofGetWidth()/3, 0, ofGetWidth()/3, ofGetHeight());
     r2.scaleFromCenter(0.95);
     danFace.set(r2);
 
-    result = ofSystemLoadDialog("Please select an audio file (.mp3, .wav, .aiff, .aac");
-    if (result.bSuccess) {
-        danVoice.load(result.getPath());
-        danVoice.play();
-    }
+    danVoice.load(dir.getAbsolutePath() + "/dan.wav");
+    danVoice.play();
     danVoice.connectTo(danFace).connectTo(mixer);
 
     ofRectangle r3(ofGetWidth()/3*2, 0, ofGetWidth()/3, ofGetHeight());
     r3.scaleFromCenter(0.95);
     mattFace.set(r3);
 
-    result = ofSystemLoadDialog("Please select an audio file (.mp3, .wav, .aiff, .aac");
-    if (result.bSuccess) {
-        mattVoice.load(result.getPath());
-        mattVoice.play();
-    }
+    mattVoice.load(dir.getAbsolutePath() + "/matt.wav");
+    mattVoice.play();
     mattVoice.connectTo(mattFace).connectTo(mixer);
 
 //    soundStream.listDevices();
