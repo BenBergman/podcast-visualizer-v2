@@ -31,10 +31,10 @@ class faceDraw: public ofRectangle, public ofxSoundObject{
          input.copyTo(output);
       }
       //--------------------------------------------------------------
-      void draw(){
+      void update(){
          if (buffer.size() >0) {
             vector<ofMesh>meshes;
-            int chans = buffer.getNumChannels();
+            chans = buffer.getNumChannels();
             for (int i = 0; i < chans; i++) {
                meshes.push_back(ofMesh());
                meshes.back().setMode(OF_PRIMITIVE_LINE_STRIP);
@@ -57,27 +57,15 @@ class faceDraw: public ofRectangle, public ofxSoundObject{
                }
                v.x += xInc;
             }
-            for (int i = 0; i < chans; i++) {
-               meshes[i].draw();
-            }
+            this->meshes = meshes;
 
 
-            float curVol = 0;
-            float curVol2 = 0;
+            curVol = 0;
+            curVol2 = 0;
             for (int i = 0; i < buffer.getNumFrames(); i++) {
                curVol += buffer[i * chans] * buffer[i * chans];
                curVol2 += ofMap(buffer[i * chans] * buffer[i * chans], 0.01, 1, 0, 1, true);
             }
-
-
-            float scaling = ofMap(smoothedVol2, 0, 1, 0.75, 2);
-            float faceWidth = face.getWidth() * scaling;
-            float faceHeight = face.getHeight() * scaling;
-            ofSetColor(255);
-            faceGray.draw(x + this->width/2 - faceWidth/2, y + this->height/2 - faceHeight/2, faceWidth, faceHeight);
-            ofSetColor(255, 255, 255, ofMap(smoothedVol2, 0, 0.2, 0, 255, true));
-            face.draw(x + this->width/2 - faceWidth/2, y + this->height/2 - faceHeight/2, faceWidth, faceHeight);
-            ofSetColor(255);
 
 
             { // raw volumes, no suppressing bleed over
@@ -86,11 +74,6 @@ class faceDraw: public ofRectangle, public ofxSoundObject{
 
                smoothedVol *= 0.90;
                smoothedVol += 0.10 * curVol;
-
-               ofSetColor(255, 0, 0);
-               ofDrawRectangle(x, this->height, 10, -curVol * this->height);
-               ofDrawRectangle(x + 15, this->height, 10, -smoothedVol * this->height);
-               ofSetColor(255);
             }
 
 
@@ -100,17 +83,48 @@ class faceDraw: public ofRectangle, public ofxSoundObject{
 
                smoothedVol2 *= 0.90;
                smoothedVol2 += 0.10 * curVol2;
-
-               ofSetColor(0, 255, 0);
-               ofDrawRectangle(x + 30, this->height, 10, -curVol2 * this->height);
-               ofDrawRectangle(x + 30 + 15, this->height, 10, -smoothedVol2 * this->height);
-               ofSetColor(255);
             }
+         }
+      }
+      //--------------------------------------------------------------
+      void draw(){
+         for (int i = 0; i < chans; i++) {
+            meshes[i].draw();
+         }
+
+
+         float scaling = ofMap(smoothedVol2, 0, 1, 0.75, 2);
+         float faceWidth = face.getWidth() * scaling;
+         float faceHeight = face.getHeight() * scaling;
+         ofSetColor(255);
+         faceGray.draw(x + this->width/2 - faceWidth/2, y + this->height/2 - faceHeight/2, faceWidth, faceHeight);
+         ofSetColor(255, 255, 255, ofMap(smoothedVol2, 0, 0.2, 0, 255, true));
+         face.draw(x + this->width/2 - faceWidth/2, y + this->height/2 - faceHeight/2, faceWidth, faceHeight);
+         ofSetColor(255);
+
+
+         { // raw volumes, no suppressing bleed over
+            ofSetColor(255, 0, 0);
+            ofDrawRectangle(x, this->height, 10, -curVol * this->height);
+            ofDrawRectangle(x + 15, this->height, 10, -smoothedVol * this->height);
+            ofSetColor(255);
+         }
+
+
+         { // supress quiet noises, likely bleed over from neighbours' mics
+            ofSetColor(0, 255, 0);
+            ofDrawRectangle(x + 30, this->height, 10, -curVol2 * this->height);
+            ofDrawRectangle(x + 30 + 15, this->height, 10, -smoothedVol2 * this->height);
+            ofSetColor(255);
          }
       }
 
       ofSoundBuffer buffer;
       mutable ofMutex mutex1;
+      vector<ofMesh>meshes;
+      int chans;
+      float curVol;
+      float curVol2;
       float smoothedVol;
       float smoothedVol2;
       ofImage face;

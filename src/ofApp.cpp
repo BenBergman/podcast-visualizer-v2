@@ -78,6 +78,9 @@ void ofApp::draw(){
         recordFbo.begin();
         ofClear(0, 0, 0, 255);
         ofSetColor(255);
+        benFace.update();
+        danFace.update();
+        mattFace.update();
         benFace.draw();
         danFace.draw();
         mattFace.draw();
