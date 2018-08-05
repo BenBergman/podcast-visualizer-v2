@@ -26,12 +26,13 @@ void ofApp::setup(){
     ofDirectory dir;
     dir.listDir("");
 
-    ofRectangle r1(0, 0, ofGetWidth()/3, ofGetHeight());
+    ofRectangle r1(ofGetWidth()/3*2, 0, ofGetWidth()/3, ofGetHeight());
     r1.scaleFromCenter(0.95);
     benFace.set(r1);
 
     benVoice.load(dir.getAbsolutePath() + "/ben.wav");
     benVoice.play();
+    benFace.setFace(dir.getAbsolutePath() + "/ben.png", dir.getAbsolutePath() + "/ben-gray.png");
     benVoice.connectTo(benFace).connectTo(mixer);
 
     ofRectangle r2(ofGetWidth()/3, 0, ofGetWidth()/3, ofGetHeight());
@@ -40,14 +41,16 @@ void ofApp::setup(){
 
     danVoice.load(dir.getAbsolutePath() + "/dan.wav");
     danVoice.play();
+    danFace.setFace(dir.getAbsolutePath() + "/dan.png", dir.getAbsolutePath() + "/dan-gray.png");
     danVoice.connectTo(danFace).connectTo(mixer);
 
-    ofRectangle r3(ofGetWidth()/3*2, 0, ofGetWidth()/3, ofGetHeight());
+    ofRectangle r3(0, 0, ofGetWidth()/3, ofGetHeight());
     r3.scaleFromCenter(0.95);
     mattFace.set(r3);
 
     mattVoice.load(dir.getAbsolutePath() + "/matt.wav");
     mattVoice.play();
+    mattFace.setFace(dir.getAbsolutePath() + "/matt.png", dir.getAbsolutePath() + "/matt-gray.png");
     mattVoice.connectTo(mattFace).connectTo(mixer);
 
 //    soundStream.listDevices();

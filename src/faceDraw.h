@@ -12,6 +12,11 @@ class faceDraw: public ofRectangle, public ofxSoundObject{
          this->set(x, y, w, h);
       }
       //--------------------------------------------------------------
+      void setFace(string facePath, string faceGrayPath){
+         face.load(facePath);
+         faceGray.load(faceGrayPath);
+      }
+      //--------------------------------------------------------------
       void process(ofSoundBuffer &input, ofSoundBuffer &output) {
          if(input.size()!=buffer.size()) {
             ofLogVerbose("faceDraw") << "working buffer size != output buffer size.";
@@ -65,6 +70,16 @@ class faceDraw: public ofRectangle, public ofxSoundObject{
             }
 
 
+            float scaling = ofMap(smoothedVol2, 0, 1, 0.75, 2);
+            float faceWidth = face.getWidth() * scaling;
+            float faceHeight = face.getHeight() * scaling;
+            ofSetColor(255);
+            faceGray.draw(x + this->width/2 - faceWidth/2, y + this->height/2 - faceHeight/2, faceWidth, faceHeight);
+            ofSetColor(255, 255, 255, ofMap(smoothedVol2, 0, 0.2, 0, 255, true));
+            face.draw(x + this->width/2 - faceWidth/2, y + this->height/2 - faceHeight/2, faceWidth, faceHeight);
+            ofSetColor(255);
+
+
             { // raw volumes, no suppressing bleed over
                curVol /= buffer.getNumFrames();
                curVol = sqrt(curVol);
@@ -98,4 +113,6 @@ class faceDraw: public ofRectangle, public ofxSoundObject{
       mutable ofMutex mutex1;
       float smoothedVol;
       float smoothedVol2;
+      ofImage face;
+      ofImage faceGray;
 };
