@@ -5,6 +5,9 @@
 #include "ofxSoundPlayerObject.h"
 #include "faceDraw.h"
 
+#define WIDTH 1920
+#define HEIGHT 1080
+
 class ofApp : public ofBaseApp{
 
 public:

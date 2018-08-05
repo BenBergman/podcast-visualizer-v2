@@ -6,7 +6,7 @@ void ofApp::setup(){
     sampleRate = 44100;
     channels = 2;
 
-    recordFbo.allocate(1920, 1080, GL_RGB);
+    recordFbo.allocate(WIDTH, HEIGHT, GL_RGB);
 
     ofSetFrameRate(60);
     ofSetLogLevel(OF_LOG_VERBOSE);
@@ -17,16 +17,16 @@ void ofApp::setup(){
     // override the default codecs if you like
     // run 'ffmpeg -codecs' to find out what your implementation supports (or -formats on some older versions)
     vidRecorder.setVideoCodec("mpeg4");
-    vidRecorder.setVideoBitrate("800k");
-    vidRecorder.setAudioCodec("mp3");
-    vidRecorder.setAudioBitrate("192k");
+    //vidRecorder.setVideoBitrate("800k");
+    //vidRecorder.setAudioCodec("mp3");
+    //vidRecorder.setAudioBitrate("192k");
 
     ofAddListener(vidRecorder.outputFileCompleteEvent, this, &ofApp::recordingComplete);
 
     ofDirectory dir;
     dir.listDir("");
 
-    ofRectangle r1(ofGetWidth()/3*2, 0, ofGetWidth()/3, ofGetHeight());
+    ofRectangle r1(WIDTH/3*2-50, 0, WIDTH/3, HEIGHT);
     r1.scaleFromCenter(0.95);
     benFace.set(r1);
 
@@ -35,7 +35,7 @@ void ofApp::setup(){
     benFace.setFace(dir.getAbsolutePath() + "/ben.png", dir.getAbsolutePath() + "/ben-gray.png");
     benVoice.connectTo(benFace).connectTo(mixer);
 
-    ofRectangle r2(ofGetWidth()/3, 0, ofGetWidth()/3, ofGetHeight());
+    ofRectangle r2(WIDTH/3, 0, WIDTH/3, HEIGHT);
     r2.scaleFromCenter(0.95);
     danFace.set(r2);
 
@@ -44,7 +44,7 @@ void ofApp::setup(){
     danFace.setFace(dir.getAbsolutePath() + "/dan.png", dir.getAbsolutePath() + "/dan-gray.png");
     danVoice.connectTo(danFace).connectTo(mixer);
 
-    ofRectangle r3(0, 0, ofGetWidth()/3, ofGetHeight());
+    ofRectangle r3(50, 0, WIDTH/3, HEIGHT);
     r3.scaleFromCenter(0.95);
     mattFace.set(r3);
 
@@ -75,16 +75,18 @@ void ofApp::update(){
 //--------------------------------------------------------------
 void ofApp::draw(){
     {
-        recordFbo.begin();
-        ofClear(0, 0, 0, 255);
-        ofSetColor(255);
         benFace.update();
         danFace.update();
         mattFace.update();
+
+        recordFbo.begin();
+        ofClear(0, 255, 0, 255);
+        ofSetColor(255);
         benFace.draw();
         danFace.draw();
         mattFace.draw();
         recordFbo.end();
+
         if(bRecording){
             recordFbo.readToPixels(recordPixels);
 
@@ -107,6 +109,10 @@ void ofApp::draw(){
 
     ofSetColor(255, 255, 255);
     recordFbo.draw(0,0);
+
+    benFace.drawDebug();
+    danFace.drawDebug();
+    mattFace.drawDebug();
 
     stringstream ss;
     ss //<< "video queue size: " << vidRecorder.getVideoQueueSize() << endl
