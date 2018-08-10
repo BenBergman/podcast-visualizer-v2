@@ -16,9 +16,9 @@ void ofApp::setup(){
 
     // override the default codecs if you like
     // run 'ffmpeg -codecs' to find out what your implementation supports (or -formats on some older versions)
-    vidRecorder.setVideoCodec("h264");
+    vidRecorder.setVideoCodec("h264_videotoolbox");
     //vidRecorder.setVideoBitrate("800k");
-    //vidRecorder.setAudioCodec("mp3");
+    vidRecorder.setAudioCodec("aac");
     //vidRecorder.setAudioBitrate("192k");
 
     ofAddListener(vidRecorder.outputFileCompleteEvent, this, &ofApp::recordingComplete);
