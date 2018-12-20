@@ -55,7 +55,7 @@ void ofApp::setup(){
 
 //    soundStream.listDevices();
 //    soundStream.setDeviceID(11);
-    soundStream.setup(this, 2, channels, sampleRate, bufferSize, 4);
+    soundStream.setup(this, channels, channels, sampleRate, bufferSize, 4);
     soundStream.setOutput(mixer);
 
     bRecording = false;
@@ -147,6 +147,14 @@ void ofApp::draw(){
 void ofApp::audioIn(float *input, int bufferSize, int nChannels){
     if(bRecording)
         vidRecorder.addAudioSamples(input, bufferSize, nChannels);
+}
+
+//--------------------------------------------------------------
+void ofApp::audioOut(float *output, int bufferSize, int nChannels){
+    /*
+    if(bRecording)
+        vidRecorder.addAudioSamples(output, bufferSize, nChannels);
+        */
 }
 
 //--------------------------------------------------------------

@@ -26,6 +26,7 @@ public:
     void dragEvent(ofDragInfo dragInfo);
     void gotMessage(ofMessage msg);
     void audioIn(float * input, int bufferSize, int nChannels);
+    void audioOut(float * input, int bufferSize, int nChannels);
 
     void startRecording();
     void stopRecording();
