@@ -14,14 +14,11 @@ void ofApp::setup(){
     fileName = "testMovie";
     fileExt = ".mov"; // ffmpeg uses the extension to determine the container type. run 'ffmpeg -formats' to see supported formats
 
+    vidRecorder.setup(true, false, glm::vec2(WIDTH, HEIGHT));
+
     // override the default codecs if you like
     // run 'ffmpeg -codecs' to find out what your implementation supports (or -formats on some older versions)
     vidRecorder.setVideoCodec("h264_videotoolbox");
-    //vidRecorder.setVideoBitrate("800k");
-    vidRecorder.setAudioCodec("aac");
-    //vidRecorder.setAudioBitrate("192k");
-
-    ofAddListener(vidRecorder.outputFileCompleteEvent, this, &ofApp::recordingComplete);
 
     ofDirectory dir;
     dir.listDir("");
@@ -53,8 +50,6 @@ void ofApp::setup(){
     mattFace.setFace(dir.getAbsolutePath() + "/matt.png", dir.getAbsolutePath() + "/matt-gray.png");
     mattVoice.connectTo(mattFace).connectTo(mixer);
 
-//    soundStream.listDevices();
-//    soundStream.setDeviceID(11);
     soundStream.setup(this, channels, channels, sampleRate, bufferSize, 4);
     soundStream.setOutput(mixer);
 
@@ -66,8 +61,6 @@ void ofApp::setup(){
 
 //--------------------------------------------------------------
 void ofApp::exit(){
-    ofRemoveListener(vidRecorder.outputFileCompleteEvent, this, &ofApp::recordingComplete);
-    vidRecorder.close();
 }
 
 //--------------------------------------------------------------
@@ -89,22 +82,13 @@ void ofApp::draw(){
         mattFace.draw();
         recordFbo.end();
 
-        if(bRecording){
+        if(vidRecorder.isRecording()){
             recordFbo.readToPixels(recordPixels);
 
             bool success = vidRecorder.addFrame(recordPixels);
             if (!success) {
                 ofLogWarning("This frame was not added!");
             }
-        }
-
-        // Check if the video recorder encountered any error while writing video frame or audio smaples.
-        if (vidRecorder.hasVideoError()) {
-            ofLogWarning("The video recorder failed to write some frames!");
-        }
-
-        if (vidRecorder.hasAudioError()) {
-            ofLogWarning("The video recorder failed to write some audio samples!");
         }
     }
 
@@ -120,15 +104,15 @@ void ofApp::draw(){
     ss //<< "video queue size: " << vidRecorder.getVideoQueueSize() << endl
     //<< "audio queue size: " << vidRecorder.getAudioQueueSize() << endl
     << "FPS: " << ofGetFrameRate() << endl
-    << (bRecording?"pause":"start") << " recording: r" << endl;
-    if (bRecording) {
+    << (vidRecorder.isRecording()?"pause":"start") << " recording: r" << endl;
+    if (vidRecorder.isRecording()) {
         ss << "close current video file: c" << endl;
     }
     if (!mattVoice.isPlaying()) {
         ss << "Audio clip finished playing" << endl;
     }
 
-    if (bRecording && !mattVoice.isPlaying()) {
+    if (vidRecorder.isRecording() && !mattVoice.isPlaying()) {
         stopRecording();
     }
 
@@ -137,7 +121,7 @@ void ofApp::draw(){
     ofSetColor(255, 255, 255);
     ofDrawBitmapString(ss.str(),15,15);
 
-    if(bRecording){
+    if(vidRecorder.isRecording()){
     ofSetColor(255, 0, 0);
     ofDrawCircle(ofGetWidth() - 20, 20, 5);
     }
@@ -145,16 +129,10 @@ void ofApp::draw(){
 
 //--------------------------------------------------------------
 void ofApp::audioIn(float *input, int bufferSize, int nChannels){
-    if(bRecording)
-        vidRecorder.addAudioSamples(input, bufferSize, nChannels);
 }
 
 //--------------------------------------------------------------
 void ofApp::audioOut(float *output, int bufferSize, int nChannels){
-    /*
-    if(bRecording)
-        vidRecorder.addAudioSamples(output, bufferSize, nChannels);
-        */
 }
 
 //--------------------------------------------------------------
@@ -177,24 +155,18 @@ void ofApp::keyReleased(int key){
 }
 
 void ofApp::startRecording() {
-    bRecording = !bRecording;
-    if(bRecording && !vidRecorder.isInitialized()) {
-        vidRecorder.setup(fileName+ofGetTimestampString()+fileExt, recordFbo.getWidth(), recordFbo.getHeight(), 30, sampleRate, channels);
-
-        // Start recording
-        vidRecorder.start();
-    }
-    else if(!bRecording && vidRecorder.isInitialized()) {
-        vidRecorder.setPaused(true);
-    }
-    else if(bRecording && vidRecorder.isInitialized()) {
-        vidRecorder.setPaused(false);
+    if (!vidRecorder.isRecording()) {
+        vidRecorder.setOutputPath(ofToDataPath(fileName+ofGetTimestampString()+fileExt, true));
+        vidRecorder.startCustomRecord();
+    } else {
+        vidRecorder.setPaused(!vidRecorder.isPaused());
     }
 }
 
 void ofApp::stopRecording() {
-    bRecording = false;
-    vidRecorder.close();
+    if (vidRecorder.isRecording()) {
+        vidRecorder.stop();
+    }
 }
 
 //--------------------------------------------------------------

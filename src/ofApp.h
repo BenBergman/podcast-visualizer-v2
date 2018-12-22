@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ofMain.h"
+#include "ofxFFmpegRecorder.h"
 #include "ofxVideoRecorder.h"
 #include "ofxSoundPlayerObject.h"
 #include "faceDraw.h"
@@ -31,7 +32,7 @@ public:
     void startRecording();
     void stopRecording();
 
-    ofxVideoRecorder    vidRecorder;
+    ofxFFmpegRecorder   vidRecorder;
     ofSoundStream       soundStream;
     bool bRecording;
     int sampleRate;
