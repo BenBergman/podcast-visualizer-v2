@@ -2,7 +2,6 @@
 
 #include "ofMain.h"
 #include "ofxFFmpegRecorder.h"
-#include "ofxVideoRecorder.h"
 #include "ofxSoundPlayerObject.h"
 #include "faceDraw.h"
 
@@ -40,7 +39,6 @@ public:
     string fileName;
     string fileExt;
 
-    void recordingComplete(ofxVideoRecorderOutputFileCompleteEventArgs& args);
 
     ofFbo recordFbo;
     ofPixels recordPixels;

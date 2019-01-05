@@ -1,4 +1,3 @@
 ofxAudioFile
 ofxFFmpegRecorder
 ofxSoundObjects
-ofxVideoRecorder

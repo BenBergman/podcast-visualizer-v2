@@ -136,11 +136,6 @@ void ofApp::audioOut(float *output, int bufferSize, int nChannels){
 }
 
 //--------------------------------------------------------------
-void ofApp::recordingComplete(ofxVideoRecorderOutputFileCompleteEventArgs& args){
-    cout << "The recoded video file is now complete." << endl;
-}
-
-//--------------------------------------------------------------
 void ofApp::keyPressed(int key){
 }
 
